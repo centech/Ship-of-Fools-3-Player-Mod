@@ -1,3 +1,5 @@
+![Three players together aboard the ship](ship.PNG)
+
 # Ship of Fools — 3 Player Mod
 
 Play local co-op with three people! The third player joins as a copy of player
@@ -21,19 +23,19 @@ You don't need to install any extra software.
 - Join two players and choose your characters as usual.
 - Once you're on the island, press a face button on the spare gamepad.
 - The third character appears beside player two. Move apart to see both!
+- Player two can change character on the island!
+- Each player has its own inventory!
 
 Use three gamepads, or a keyboard/mouse and two gamepads.
 
-Players two and three share the inventory panel on the right. Press your own
-inventory button to see your items; press it again to close. Either player can
-take over the panel from the other.
+
 
 ## A few things to know
 
 - This is an experimental mod. Character selection and some menus still have
-  only two player slots. Player three starts with player two's chosen character.
+  only two player slots. Player three starts with player two's chosen character. Player two can change the character on the island.
 - **Player three's items aren't saved separately.** Put valuable items on the
-  ship before changing areas or quitting.
+  ship before quitting.
 - This adds a third player for local play. Online play is not supported.
 - The installer checks that your game is compatible. If it says your version
   isn't supported, check this project for an update.
@@ -49,7 +51,7 @@ with what happened and which controllers you use.
 
 ## Screenshots
 
-![Three players together aboard the ship](ship.PNG)
+
 
 ![Another view of three-player co-op](ship2.PNG)
 
