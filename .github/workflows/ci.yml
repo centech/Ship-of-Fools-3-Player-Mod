@@ -1,0 +1,36 @@
+name: Validate patch
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  portable:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install development dependencies
+        run: python -m pip install -r requirements-dev.txt
+      - name: Check committed release and payload
+        run: python tools/check_distribution.py
+      - name: Run portable native-payload tests
+        run: python third_player_mod/test_payload.py
+      - name: Rebuild the helper from source
+        run: python third_player_mod/build.py
+      - name: Require matching released helper bytes
+        run: git diff --exit-code -- third_player_mod/code.bin third_player_mod/state.bin third_player_mod/manifest.json
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check installer parsing and refusal paths without game files
+        shell: powershell
+        run: .\tools\test_windows_safety.ps1

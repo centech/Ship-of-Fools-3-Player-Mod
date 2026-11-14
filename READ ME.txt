@@ -1,0 +1,33 @@
+SHIP OF FOOLS - 3 PLAYER MOD
+Version 0.4.0 | Windows / Steam
+
+INSTALL
+1. Close the game.
+2. In Steam, right-click Ship of Fools > Manage > Browse local files.
+3. Extract EVERYTHING from this ZIP into that game folder.
+   Install.cmd should be beside ShipOfFools.exe.
+4. Double-click Install.cmd, then start the game normally.
+
+PLAY
+Join two players and choose characters as usual. Once on the island, press a
+face button on the spare gamepad. Player three appears beside player two.
+Use three gamepads, or a keyboard/mouse and two gamepads.
+
+Players two and three share the inventory on the right. Your inventory button
+shows your own items. Press it again to close, or let the other player take over.
+
+PLEASE NOTE
+- This is an experimental local-play mod. Some menus still support two players.
+- Player three starts as a copy of player two.
+- Player three's items are NOT saved separately. Put valuable items on the ship
+  before changing areas or quitting.
+- The installer will tell you if your game version is unsupported.
+
+UNINSTALL
+Close the game and double-click Uninstall.cmd in the game folder.
+
+TROUBLE INSTALLING?
+Make sure you extracted the ZIP into the actual game folder, not Downloads.
+If Windows denies access, right-click Install.cmd and choose Run as administrator.
+If a download is damaged, download and extract a fresh copy.
+Visit the project's GitHub page for help and updates.

@@ -1,0 +1,226 @@
+{
+  "version": 1,
+  "code_rva": 58937344,
+  "data_rva": 58953728,
+  "unwind_rva": 58957824,
+  "symbols": {
+    "log_message": {
+      "rva": 58937344,
+      "size": 37,
+      "kind": "t"
+    },
+    "forget_clone": {
+      "rva": 58937381,
+      "size": 109,
+      "kind": "t"
+    },
+    "clone_actor": {
+      "rva": 58937490,
+      "size": 30,
+      "kind": "t"
+    },
+    "local_scene": {
+      "rva": 58937520,
+      "size": 50,
+      "kind": "t"
+    },
+    "join_clone": {
+      "rva": 58937570,
+      "size": 382,
+      "kind": "t"
+    },
+    "third_input_awake": {
+      "rva": 58937952,
+      "size": 366,
+      "kind": "T"
+    },
+    "third_spawn": {
+      "rva": 58938318,
+      "size": 104,
+      "kind": "T"
+    },
+    "third_reset": {
+      "rva": 58938422,
+      "size": 49,
+      "kind": "T"
+    },
+    "third_despawn": {
+      "rva": 58938471,
+      "size": 48,
+      "kind": "T"
+    },
+    "third_dispatch": {
+      "rva": 58938519,
+      "size": 279,
+      "kind": "T"
+    },
+    "third_save_count": {
+      "rva": 58938798,
+      "size": 28,
+      "kind": "T"
+    },
+    "third_inventory_match": {
+      "rva": 58938826,
+      "size": 87,
+      "kind": "T"
+    },
+    "third_inventory_update": {
+      "rva": 58938913,
+      "size": 514,
+      "kind": "T"
+    },
+    "original_spawn": {
+      "rva": 58939427,
+      "size": 10,
+      "kind": "T"
+    },
+    "original_reset": {
+      "rva": 58939437,
+      "size": 10,
+      "kind": "T"
+    },
+    "original_despawn": {
+      "rva": 58939447,
+      "size": 10,
+      "kind": "T"
+    },
+    "original_input_awake": {
+      "rva": 58939457,
+      "size": 10,
+      "kind": "T"
+    },
+    "original_inventory_update": {
+      "rva": 58939467,
+      "size": 10,
+      "kind": "T"
+    },
+    "original_inventory_match": {
+      "rva": 58939477,
+      "size": 13,
+      "kind": "T"
+    },
+    "mod_state": {
+      "rva": 58953728,
+      "size": 56,
+      "kind": "D"
+    }
+  },
+  "functions": [
+    {
+      "name": "log_message",
+      "begin": 58937344,
+      "end": 58937381,
+      "unwind": "0104010004420000"
+    },
+    {
+      "name": "forget_clone",
+      "begin": 58937381,
+      "end": 58937490,
+      "unwind": "01060200063202c0"
+    },
+    {
+      "name": "clone_actor",
+      "begin": 58937490,
+      "end": 58937520,
+      "unwind": "0104010004420000"
+    },
+    {
+      "name": "local_scene",
+      "begin": 58937520,
+      "end": 58937570,
+      "unwind": "01000000"
+    },
+    {
+      "name": "join_clone",
+      "begin": 58937570,
+      "end": 58937952,
+      "unwind": "0112060012011d000930086004c002d0"
+    },
+    {
+      "name": "third_input_awake",
+      "begin": 58937952,
+      "end": 58938318,
+      "unwind": "01140700146210300f600ec00cd007e002f00000"
+    },
+    {
+      "name": "third_spawn",
+      "begin": 58938318,
+      "end": 58938422,
+      "unwind": "01090200093202c0"
+    },
+    {
+      "name": "third_reset",
+      "begin": 58938422,
+      "end": 58938471,
+      "unwind": "0104010004420000"
+    },
+    {
+      "name": "third_despawn",
+      "begin": 58938471,
+      "end": 58938519,
+      "unwind": "0104010004420000"
+    },
+    {
+      "name": "third_dispatch",
+      "begin": 58938519,
+      "end": 58938798,
+      "unwind": "0118070018c2113010600f700b5007c002d00000"
+    },
+    {
+      "name": "third_save_count",
+      "begin": 58938798,
+      "end": 58938826,
+      "unwind": "0104010004420000"
+    },
+    {
+      "name": "third_inventory_match",
+      "begin": 58938826,
+      "end": 58938913,
+      "unwind": "01090200093202c0"
+    },
+    {
+      "name": "third_inventory_update",
+      "begin": 58938913,
+      "end": 58939427,
+      "unwind": "0113090013620f300e600d700c5008c006d004e002f00000"
+    },
+    {
+      "name": "original_spawn",
+      "begin": 58939427,
+      "end": 58939437,
+      "unwind": "0105020005340100"
+    },
+    {
+      "name": "original_reset",
+      "begin": 58939437,
+      "end": 58939447,
+      "unwind": "0105030005e003d001600000"
+    },
+    {
+      "name": "original_despawn",
+      "begin": 58939447,
+      "end": 58939457,
+      "unwind": "0105020005320160"
+    },
+    {
+      "name": "original_input_awake",
+      "begin": 58939457,
+      "end": 58939467,
+      "unwind": "0105020005320130"
+    },
+    {
+      "name": "original_inventory_update",
+      "begin": 58939467,
+      "end": 58939477,
+      "unwind": "0105020005340200"
+    },
+    {
+      "name": "original_inventory_match",
+      "begin": 58939477,
+      "end": 58939490,
+      "unwind": "0108030008012c0001300000"
+    }
+  ],
+  "code_sha256": "43d329dec323682f8d17c54679ec13e386fc3932758858edfe7afa557e64b6e4",
+  "state_sha256": "5a266da15e02edb55d418573ae2dfa57d3fab3846133c8cace443252cf2c3794"
+}

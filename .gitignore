@@ -1,0 +1,48 @@
+# Game binaries, extracted assets, saves and local rollback copies.
+GameAssembly*
+*.dll
+*.exe
+*.pdb
+*.bundle
+*.unity3d
+*_Data/
+Il2CppDumper*/
+sofdump/
+DummyDll/
+backup*/
+*.backup*
+save.bin
+save.bin.*
+Player*.log
+.sof-*/
+.sof-*
+
+# The only binary inputs tracked here are this project's small helper payloads.
+*.bin
+!third_player_mod/code.bin
+!third_player_mod/state.bin
+
+# Compiler and Python output.
+*.o
+*.obj
+*.elf
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Release ZIPs belong in dist; do not collect arbitrary archives.
+*.zip
+*.zip.sha256
+!dist/*.zip
+!dist/*.zip.sha256
+
+# Local environment and editor files.
+.env
+.env.*
+!.env.example
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

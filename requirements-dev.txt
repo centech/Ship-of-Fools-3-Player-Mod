@@ -1,0 +1,4 @@
+# Needed only for helper builds and tests, never for Windows installation.
+capstone==5.0.7
+unicorn==2.1.4
+pefile==2024.8.26
