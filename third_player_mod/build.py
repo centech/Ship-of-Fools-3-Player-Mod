@@ -8,7 +8,7 @@ import subprocess
 import capstone
 
 ROOT = Path(__file__).resolve().parent
-CODE_RVA, DATA_RVA, UNWIND_RVA = 0x3835000, 0x3839000, 0x383a000
+CODE_RVA, DATA_RVA, UNWIND_RVA = 0x3837000, 0x383b000, 0x383c000
 
 def run(*args):
     return subprocess.check_output(args, cwd=ROOT, text=True)

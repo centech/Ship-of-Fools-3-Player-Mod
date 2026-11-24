@@ -1,106 +1,106 @@
 {
   "version": 1,
-  "code_rva": 58937344,
-  "data_rva": 58953728,
-  "unwind_rva": 58957824,
+  "code_rva": 58945536,
+  "data_rva": 58961920,
+  "unwind_rva": 58966016,
   "symbols": {
     "log_message": {
-      "rva": 58937344,
+      "rva": 58945536,
       "size": 37,
       "kind": "t"
     },
     "forget_clone": {
-      "rva": 58937381,
+      "rva": 58945573,
       "size": 109,
       "kind": "t"
     },
     "clone_actor": {
-      "rva": 58937490,
+      "rva": 58945682,
       "size": 30,
       "kind": "t"
     },
     "local_scene": {
-      "rva": 58937520,
+      "rva": 58945712,
       "size": 50,
       "kind": "t"
     },
     "join_clone": {
-      "rva": 58937570,
+      "rva": 58945762,
       "size": 382,
       "kind": "t"
     },
     "third_input_awake": {
-      "rva": 58937952,
+      "rva": 58946144,
       "size": 366,
       "kind": "T"
     },
     "third_spawn": {
-      "rva": 58938318,
+      "rva": 58946510,
       "size": 104,
       "kind": "T"
     },
     "third_reset": {
-      "rva": 58938422,
+      "rva": 58946614,
       "size": 49,
       "kind": "T"
     },
     "third_despawn": {
-      "rva": 58938471,
+      "rva": 58946663,
       "size": 48,
       "kind": "T"
     },
     "third_dispatch": {
-      "rva": 58938519,
+      "rva": 58946711,
       "size": 279,
       "kind": "T"
     },
     "third_save_count": {
-      "rva": 58938798,
+      "rva": 58946990,
       "size": 28,
       "kind": "T"
     },
     "third_inventory_match": {
-      "rva": 58938826,
+      "rva": 58947018,
       "size": 87,
       "kind": "T"
     },
     "third_inventory_update": {
-      "rva": 58938913,
+      "rva": 58947105,
       "size": 514,
       "kind": "T"
     },
     "original_spawn": {
-      "rva": 58939427,
+      "rva": 58947619,
       "size": 10,
       "kind": "T"
     },
     "original_reset": {
-      "rva": 58939437,
+      "rva": 58947629,
       "size": 10,
       "kind": "T"
     },
     "original_despawn": {
-      "rva": 58939447,
+      "rva": 58947639,
       "size": 10,
       "kind": "T"
     },
     "original_input_awake": {
-      "rva": 58939457,
+      "rva": 58947649,
       "size": 10,
       "kind": "T"
     },
     "original_inventory_update": {
-      "rva": 58939467,
+      "rva": 58947659,
       "size": 10,
       "kind": "T"
     },
     "original_inventory_match": {
-      "rva": 58939477,
+      "rva": 58947669,
       "size": 13,
       "kind": "T"
     },
     "mod_state": {
-      "rva": 58953728,
+      "rva": 58961920,
       "size": 56,
       "kind": "D"
     }
@@ -108,119 +108,119 @@
   "functions": [
     {
       "name": "log_message",
-      "begin": 58937344,
-      "end": 58937381,
+      "begin": 58945536,
+      "end": 58945573,
       "unwind": "0104010004420000"
     },
     {
       "name": "forget_clone",
-      "begin": 58937381,
-      "end": 58937490,
+      "begin": 58945573,
+      "end": 58945682,
       "unwind": "01060200063202c0"
     },
     {
       "name": "clone_actor",
-      "begin": 58937490,
-      "end": 58937520,
+      "begin": 58945682,
+      "end": 58945712,
       "unwind": "0104010004420000"
     },
     {
       "name": "local_scene",
-      "begin": 58937520,
-      "end": 58937570,
+      "begin": 58945712,
+      "end": 58945762,
       "unwind": "01000000"
     },
     {
       "name": "join_clone",
-      "begin": 58937570,
-      "end": 58937952,
+      "begin": 58945762,
+      "end": 58946144,
       "unwind": "0112060012011d000930086004c002d0"
     },
     {
       "name": "third_input_awake",
-      "begin": 58937952,
-      "end": 58938318,
+      "begin": 58946144,
+      "end": 58946510,
       "unwind": "01140700146210300f600ec00cd007e002f00000"
     },
     {
       "name": "third_spawn",
-      "begin": 58938318,
-      "end": 58938422,
+      "begin": 58946510,
+      "end": 58946614,
       "unwind": "01090200093202c0"
     },
     {
       "name": "third_reset",
-      "begin": 58938422,
-      "end": 58938471,
+      "begin": 58946614,
+      "end": 58946663,
       "unwind": "0104010004420000"
     },
     {
       "name": "third_despawn",
-      "begin": 58938471,
-      "end": 58938519,
+      "begin": 58946663,
+      "end": 58946711,
       "unwind": "0104010004420000"
     },
     {
       "name": "third_dispatch",
-      "begin": 58938519,
-      "end": 58938798,
+      "begin": 58946711,
+      "end": 58946990,
       "unwind": "0118070018c2113010600f700b5007c002d00000"
     },
     {
       "name": "third_save_count",
-      "begin": 58938798,
-      "end": 58938826,
+      "begin": 58946990,
+      "end": 58947018,
       "unwind": "0104010004420000"
     },
     {
       "name": "third_inventory_match",
-      "begin": 58938826,
-      "end": 58938913,
+      "begin": 58947018,
+      "end": 58947105,
       "unwind": "01090200093202c0"
     },
     {
       "name": "third_inventory_update",
-      "begin": 58938913,
-      "end": 58939427,
+      "begin": 58947105,
+      "end": 58947619,
       "unwind": "0113090013620f300e600d700c5008c006d004e002f00000"
     },
     {
       "name": "original_spawn",
-      "begin": 58939427,
-      "end": 58939437,
+      "begin": 58947619,
+      "end": 58947629,
       "unwind": "0105020005340100"
     },
     {
       "name": "original_reset",
-      "begin": 58939437,
-      "end": 58939447,
+      "begin": 58947629,
+      "end": 58947639,
       "unwind": "0105030005e003d001600000"
     },
     {
       "name": "original_despawn",
-      "begin": 58939447,
-      "end": 58939457,
+      "begin": 58947639,
+      "end": 58947649,
       "unwind": "0105020005320160"
     },
     {
       "name": "original_input_awake",
-      "begin": 58939457,
-      "end": 58939467,
+      "begin": 58947649,
+      "end": 58947659,
       "unwind": "0105020005320130"
     },
     {
       "name": "original_inventory_update",
-      "begin": 58939467,
-      "end": 58939477,
+      "begin": 58947659,
+      "end": 58947669,
       "unwind": "0105020005340200"
     },
     {
       "name": "original_inventory_match",
-      "begin": 58939477,
-      "end": 58939490,
+      "begin": 58947669,
+      "end": 58947682,
       "unwind": "0108030008012c0001300000"
     }
   ],
-  "code_sha256": "43d329dec323682f8d17c54679ec13e386fc3932758858edfe7afa557e64b6e4",
+  "code_sha256": "2eb5ec5e2667b995849824cef27ef3bac61eb9321d2de306d794b539b581cf64",
   "state_sha256": "5a266da15e02edb55d418573ae2dfa57d3fab3846133c8cace443252cf2c3794"
 }

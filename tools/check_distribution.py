@@ -43,46 +43,36 @@ def main():
     fingerprint = re.search(r"Get-BytesHash \$planBytes\) -ne '([0-9a-f]{64})'", script)
     check(fingerprint is not None and fingerprint[1] == sha(plan_bytes),
           'PowerShell plan fingerprint is stale.')
-    check(plan['original_sha256'] == patch.BASELINE_SHA256, 'Baseline fingerprint mismatch.')
-    check(set(plan['actions']) == {'Install', 'Uninstall'}, 'Unexpected actions.')
     check(plan['version'] == package.VERSION, 'Release versions differ.')
-    for action, key in [('Install', 'patched_sha256'), ('Uninstall', 'original_sha256')]:
-        check(plan['actions'][action]['sha256'] == plan[key], 'Action hash mismatch: ' + action)
-        check(plan[key] in plan['accepted_sha256'], 'Output is not recognized: ' + action)
-    check(patch.PREVIOUS_SHA256.issubset(plan['accepted_sha256']), 'Missing upgrade input.')
+    check({item['original_sha256'] for item in plan['variants']} == set(patch.BASELINES),
+          'Baseline fingerprints differ.')
+    check(len(plan['variants']) == len(patch.BASELINES), 'Repeated input version.')
 
-    # The original game is absent. Header/hook payloads and new sections are
-    # still enough to verify all embedded helper bytes and native hook targets.
-    install = plan['actions']['Install']
-    writes = [(int(w['offset']), base64.b64decode(w['data'], validate=True))
-              for w in install['writes']]
-    for offset, data in writes:
-        check(offset >= 0 and offset + len(data) <= install['size'], 'Write outside output.')
-    header = next(data for offset, data in writes if offset == 0)
-    check(struct.unpack_from('<I', header, 0x258)[0] == 0x224080c,
-          'Original game section size changed.')
-    for expected_offset, expected in [(0x7a5dd9, bytes.fromhex('e8 52 8b 22 00')),
-                                      (0x260d810, bytes(102))]:
-        check((expected_offset, expected) in writes,
-              'Normal ship cleanup was not restored when upgrading an older mod.')
-    _, _, _, sections = patch.pe_layout(header)
-    for rva, expected in [(manifest['code_rva'], code), (manifest['data_rva'], state)]:
-        offset = patch.offset(sections, rva)
-        part = next((data[offset-start:offset-start+len(expected)]
-                     for start, data in writes
-                     if start <= offset and offset+len(expected) <= start+len(data)), None)
-        check(part == expected, 'Portable plan embeds a different helper payload.')
-    hooks = [(0x6dde70, 'third_spawn'), (0x925a20, 'third_reset'),
-             (0x6dd430, 'third_despawn'), (0x1187030, 'third_input_awake'),
-             (0x8fed9a, 'third_dispatch'), (0x8c0e90, 'third_inventory_update'),
-             (0x8c0490, 'third_inventory_match')] + [
-             (rva, 'third_save_count') for rva in [0x6c5331, 0x6c5389, 0x6c563e, 0x6c5696]]
-    for rva, symbol in hooks:
-        offset = patch.offset(sections, rva)
-        data = next(data for start, data in writes if start == offset)
-        check(data[0] in (0xe8, 0xe9), 'Unexpected hook opcode.')
-        target = rva + 5 + struct.unpack_from('<i', data, 1)[0]
-        check(target == manifest['symbols'][symbol]['rva'], 'Wrong hook target: ' + symbol)
+    # Check each variant without distributing any protected game files.
+    for variant in plan['variants']:
+        check(set(variant['actions']) == {'Install', 'Uninstall'}, 'Unexpected actions.')
+        for action, key in [('Install', 'patched_sha256'), ('Uninstall', 'original_sha256')]:
+            check(variant['actions'][action]['sha256'] == variant[key], 'Action hash mismatch: ' + action)
+        install = variant['actions']['Install']
+        writes = {int(w['offset']): base64.b64decode(w['data'], validate=True) for w in install['writes']}
+        undo = {int(w['offset']): base64.b64decode(w['data'], validate=True)
+                for w in variant['actions']['Uninstall']['writes']}
+        for offset, data in writes.items():
+            check(offset >= 0 and offset + len(data) <= install['size'], 'Write outside output.')
+        _, _, _, sections = patch.pe_layout(writes[0])
+        for rva, expected in [(manifest['code_rva'], code), (manifest['data_rva'], state)]:
+            offset = patch.offset(sections, rva)
+            part = next((data[offset-start:offset-start+len(expected)]
+                         for start, data in writes.items()
+                         if start <= offset and offset+len(expected) <= start+len(data)), None)
+            check(part == expected, 'Portable plan embeds a different helper payload.')
+        for rva, expected, symbol, opcode in patch.HOOKS:
+            offset = patch.offset(sections, rva)
+            data = writes[offset]
+            check(data[0] == opcode, 'Unexpected hook opcode.')
+            target = rva + 5 + struct.unpack_from('<i', data, 1)[0]
+            check(target == manifest['symbols'][symbol]['rva'], 'Wrong hook target: ' + symbol)
+            check(undo[offset].hex() == expected, 'Uninstall must restore the expected game instruction.')
 
     archive = ROOT / ('dist/Ship-of-Fools-3-Player-Mod-'+package.VERSION+'.zip')
     sidecar = archive.with_suffix('.zip.sha256').read_text().split()
@@ -114,7 +104,7 @@ def main():
     for name in ('ship.PNG', 'ship2.PNG'):
         check((ROOT / name).is_file() and ']('+name+')' in (ROOT / 'README.md').read_text(),
               'README screenshot is missing: '+name)
-    print('PASS: release ZIP, file hashes, plan, payload, 11 hooks and normal ship cleanup.')
+    print('PASS: release ZIP, file hashes, plan, payload, 11 hooks for both Steam 1.5.4 inputs.')
     print('No game DLL was needed or bundled.')
 
 

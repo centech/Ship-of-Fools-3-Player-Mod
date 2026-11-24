@@ -78,8 +78,8 @@ struct ModState {
 __attribute__((used)) struct ModState mod_state = { .controller = -1 };
 
 static void log_message(const char *message) {
-    void *str = API(0x319600, StringFn)(message);
-    if (str) API(0xd9b9b0, LogFn)(str, 0);
+    void *str = API(0x3190a0, StringFn)(message);
+    if (str) API(0xd87870, LogFn)(str, 0);
 }
 
 static void log_controller(int id) {
@@ -100,8 +100,8 @@ static void forget_clone(void) {
     mod_state.spawning = 0;
     mod_state.scene = 0;
     mod_state.buttons_logged = 0;
-    if (h) API(0x318cd0, FreeHandleFn)(h);
-    if (second) API(0x318cd0, FreeHandleFn)(second);
+    if (h) API(0x318770, FreeHandleFn)(h);
+    if (second) API(0x318770, FreeHandleFn)(second);
 }
 
 static int local_scene(void *scene) {
@@ -113,9 +113,9 @@ static int local_scene(void *scene) {
 
 static int unused_controller(void *scene, int id) {
     if (id <= 0 || !local_scene(scene)) return 0;
-    if (API(0xad0880, KeyboardFn)(id, 0)) return 0;
+    if (API(0xabcae0, KeyboardFn)(id, 0)) return 0;
     void *ps = PTR(scene, 0xa0);
-    ControllerFn get = API(0x923330, ControllerFn);
+    ControllerFn get = API(0x90f390, ControllerFn);
     return get(ps, 0, 0) != id && get(ps, 1, 0) != id;
 }
 
@@ -140,20 +140,20 @@ void third_input_awake(void *manager, void *method) {
         }
     }
     if (pads == 2 && template) {
-        void *p = API(0x1d36a20, ObjectFn)(template, 0);
+        void *p = API(0x1d22ce0, ObjectFn)(template, 0);
         if (p) {
-            int id = API(0xce5da0, IdFn)(user, 0);
+            int id = API(0xcd1c90, IdFn)(user, 0);
             INT(p, 0x10) = id;
-            void *name = API(0x319600, StringFn)("Player3LocalClone");
+            void *name = API(0x3190a0, StringFn)("Player3LocalClone");
             API(0x495c60, NameFn)(p, name, 0);
             API(0x495c50, NameFn)(p, name, 0);
             BYTE(p, 0x28) = 1;
             BYTE(p, 0x58) = 0;
             BYTE(p, 0x59) = 0;
             BYTE(p, 0x5a) = 0;
-            API(0x397c60, MetadataFn)((void *)((uptr)image_base + 0x30b2028));
-            API(0x23ca7e0, AddFn)(list, p,
-                *(void **)((uptr)image_base + 0x30b2028));
+            API(0x397700, MetadataFn)((void *)((uptr)image_base + 0x3240b88));
+            API(0x23b6aa0, AddFn)(list, p,
+                *(void **)((uptr)image_base + 0x3240b88));
             mod_state.input_slot = id;
             log_message("[ThirdPlayer] Added third gamepad input slot.");
         }
@@ -163,7 +163,7 @@ void third_input_awake(void *manager, void *method) {
 
 static void *clone_actor(void) {
     return mod_state.clone_handle
-        ? API(0x318ce0, TargetFn)(mod_state.clone_handle) : (void *)0;
+        ? API(0x318780, TargetFn)(mod_state.clone_handle) : (void *)0;
 }
 
 static void assign_controller(void *clone) {
@@ -175,7 +175,7 @@ static void join_clone(void *scene, int controller) {
     if (mod_state.spawning || mod_state.clone_handle ||
         !unused_controller(scene, controller)) return;
     void *ps = PTR(scene, 0xa0);
-    void *assigned = API(0x9228f0, ObjectFn)(ps, 0);
+    void *assigned = API(0x90e950, ObjectFn)(ps, 0);
     if (!assigned || INT(assigned, 0x18) != 2) return;
 
     /* GetAssignedPlayerBlueprints returns a managed array of 0xc0-byte values.
@@ -189,9 +189,9 @@ static void join_clone(void *scene, int controller) {
 
     mod_state.spawning = 1;
     mod_state.controller = controller;
-    void *actor = API(0x6ddba0, SpawnFn)(scene, copy, 0);
+    void *actor = API(0x6ddc30, SpawnFn)(scene, copy, 0);
     if (actor) {
-        mod_state.clone_handle = API(0x318cf0, NewHandleFn)(actor, 0);
+        mod_state.clone_handle = API(0x318790, NewHandleFn)(actor, 0);
         assign_controller(actor);
         ++mod_state.joins;
         log_message("[ThirdPlayer] Player two clone spawned with an independent gamepad.");
@@ -239,7 +239,7 @@ void third_dispatch(void *scene, int controller, void *input, void *method) {
         actor = clone_actor();
         assign_controller(actor);
     }
-    API(0x6dc7f0, DispatchFn)(scene, controller, input, method);
+    API(0x6dc880, DispatchFn)(scene, controller, input, method);
 }
 
 /* ToGameData has two positional player-save slots. Its character loop indexes
@@ -248,7 +248,7 @@ void third_dispatch(void *scene, int controller, void *input, void *method) {
  * prevents P3 trinkets being written to an unsupported third vanilla save slot.
  */
 int third_save_count(void *players, void *method) {
-    int count = API(0x5026e0, IdFn)(players, method);
+    int count = API(0x502750, IdFn)(players, method);
     return count > 2 ? 2 : count;
 }
 
@@ -284,15 +284,15 @@ static void *current_second_actor(void *inventory, void *clone) {
     void *second = 0;
     if (players) {
         if (!mod_state.inventory_metadata) {
-            API(0x397c60, MetadataFn)((void *)((uptr)image_base + 0x30ba7b0));
-            API(0x397c60, MetadataFn)((void *)((uptr)image_base + 0x30ba880));
+            API(0x397700, MetadataFn)((void *)((uptr)image_base + 0x3249318));
+            API(0x397700, MetadataFn)((void *)((uptr)image_base + 0x32493e8));
             mod_state.inventory_metadata = 1;
         }
-        int count = API(0x5026e0, IdFn)(players,
-            *(void **)((uptr)image_base + 0x30ba7b0));
+        int count = API(0x502750, IdFn)(players,
+            *(void **)((uptr)image_base + 0x3249318));
         for (int i = 0; i < count; ++i) {
-            void *actor = API(0x119c810, ItemFn)(players, i,
-                *(void **)((uptr)image_base + 0x30ba880));
+            void *actor = API(0x11886d0, ItemFn)(players, i,
+                *(void **)((uptr)image_base + 0x32493e8));
             if (actor && actor != clone &&
                 original_inventory_match(inventory, actor, 0)) {
                 second = actor;
@@ -301,12 +301,12 @@ static void *current_second_actor(void *inventory, void *clone) {
         }
     }
     void *previous = mod_state.second_handle
-        ? API(0x318ce0, TargetFn)(mod_state.second_handle) : (void *)0;
+        ? API(0x318780, TargetFn)(mod_state.second_handle) : (void *)0;
     if (previous != second) {
         if (mod_state.second_handle)
-            API(0x318cd0, FreeHandleFn)(mod_state.second_handle);
+            API(0x318770, FreeHandleFn)(mod_state.second_handle);
         mod_state.second_handle = second
-            ? API(0x318cf0, NewHandleFn)(second, 0) : 0;
+            ? API(0x318790, NewHandleFn)(second, 0) : 0;
     }
     return second;
 }
@@ -325,9 +325,9 @@ void third_inventory_update(void *inventory, void *method) {
         if (second && other && inventory_pressed(other) &&
             !inventory_pressed(bound)) {
             if (BYTE(inventory, 0x90))
-                API(0x8c03a0, InventoryFn)(inventory, 0);
+                API(0x8ac510, InventoryFn)(inventory, 0);
             mod_state.inventory_owner = other == clone ? 3 : 2;
-            API(0x8bf670, LinkFn)(inventory, 0, 0, 0);
+            API(0x8ab7e0, LinkFn)(inventory, 0, 0, 0);
             log_message(other == clone ?
                 "[ThirdPlayer] Right inventory panel now belongs to player three." :
                 "[ThirdPlayer] Right inventory panel now belongs to player two.");

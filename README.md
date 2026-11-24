@@ -5,7 +5,7 @@
 Play local co-op with three people! The third player joins as a copy of player
 two and uses their own gamepad.
 
-**[Download the mod](dist/Ship-of-Fools-3-Player-Mod-0.4.0.zip?raw=true)** · Windows / Steam · Version 0.4.0
+**[Download the mod](dist/Ship-of-Fools-3-Player-Mod-0.5.0.zip?raw=true)** · Windows / Steam 1.5.4 · Mod version 0.5.0
 
 ## Install
 
@@ -16,7 +16,11 @@ two and uses their own gamepad.
 4. Double-click **Install.cmd**. When it says the mod is installed, start the
    game normally.
 
-You don't need to install any extra software.
+You don't need to install any extra software. If Steam already updated your game
+from 1.5.3, run this installer directly.
+
+Using After the Storm too? Install **Siren Update 1.2** first, then install the
+3 Player Mod. To remove After the Storm later, uninstall the 3 Player Mod first.
 
 ## Play with three people
 
@@ -43,6 +47,8 @@ Use three gamepads, or a keyboard/mouse and two gamepads.
 ## Uninstall
 
 Close the game, then double-click **Uninstall.cmd** in the game folder.
+
+Still on Steam 1.5.3? Use the [0.4.0 ZIP](dist/Ship-of-Fools-3-Player-Mod-0.4.0.zip?raw=true).
 
 ## Need help?
 

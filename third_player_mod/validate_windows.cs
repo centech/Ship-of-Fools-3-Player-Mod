@@ -17,7 +17,7 @@ public static class ThirdPlayerLoaderCheck {
         if (module == IntPtr.Zero) throw new Win32Exception(Marshal.GetLastWin32Error());
         try {
             ulong start = (ulong)module.ToInt64();
-            foreach (int rva in new int[] {0x6dde70, 0x1187030, helperRva}) {
+            foreach (int rva in new int[] {0x6ddf00, 0x1172ef0, helperRva}) {
                 ulong image;
                 IntPtr entry = RtlLookupFunctionEntry(start+(ulong)rva, out image, IntPtr.Zero);
                 if (entry == IntPtr.Zero || image != start || Marshal.ReadInt32(entry) != rva)

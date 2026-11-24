@@ -16,8 +16,27 @@ import struct
 import sys
 import tempfile
 
-BASELINE_SHA256 = 'c9e858959f9d6c4d45b74e5d9a60532bb4ea4298b652f06f7272aace61242f67'
-PREVIOUS_SHA256 = {'5e84ddb03ca605c79e4b3f5d61bae30a7a60efbf1bfb88b69ae444e9931822b1','c634edc51ac12e57ae523df8f4bea250572e78ee78529bcaca231cbd8f131998','c740d78166c28841567c7cd6875f9f7f28be37d5a141dd3021ef078c6aa84fe6','a225b05eee16ef7168c9a6e7c3e6f7576e39ab7ab0ed141a69eb47886e18390a','d9dfa912f09d733c4118d582496f8081124e58dfeb7f24dee12b72f41b7122e6'}
+BASELINE_SHA256 = '33d432060e5cd1bd6240085fcbc7abb2e3d6b71e430bdb2ee1611e7405031500'
+SIREN_SHA256 = 'd177b88649a245d663c85d34b851f0bf295e11a2a0c69315bc7f7b28d54ac72c'
+BASELINES = {
+    BASELINE_SHA256: 'Steam 1.5.4',
+    SIREN_SHA256: 'Steam 1.5.4 with the After the Storm Siren Update 1.2',
+}
+
+# (RVA, stock instructions, helper symbol, rel32 opcode)
+HOOKS = (
+    (0x6ddf00, '48895c2408', 'third_spawn', 0xe9),
+    (0x911a80, '405641554156', 'third_reset', 0xe9),
+    (0x6dd4c0, '40564883ec20', 'third_despawn', 0xe9),
+    (0x1172ef0, '40534883ec20', 'third_input_awake', 0xe9),
+    (0x8eaf0a, 'e87119dfff', 'third_dispatch', 0xe8),
+    (0x8ad000, '48895c2410', 'third_inventory_update', 0xe9),
+    (0x8ac600, '40534881ec60010000', 'third_inventory_match', 0xe9),
+    (0x6c53c1, 'e88ad3e3ff', 'third_save_count', 0xe8),
+    (0x6c5419, 'e832d3e3ff', 'third_save_count', 0xe8),
+    (0x6c56ce, 'e87dd0e3ff', 'third_save_count', 0xe8),
+    (0x6c5726, 'e825d0e3ff', 'third_save_count', 0xe8),
+)
 ROOT = Path(__file__).resolve().parent
 PAYLOAD = ROOT / 'third_player_mod'
 
@@ -44,8 +63,8 @@ def offset(sections, rva):
     raise ValueError(f'RVA outside file-backed sections: {rva:x}')
 
 def build_patch(baseline):
-    if sha(baseline) != BASELINE_SHA256:
-        raise ValueError('Unsupported DLL. The builder requires the exact original game build.')
+    if sha(baseline) not in BASELINES:
+        raise ValueError('Unsupported DLL. The builder requires a recognized Steam 1.5.4 input.')
     m = json.loads((PAYLOAD/'manifest.json').read_text())
     code, state = (PAYLOAD/'code.bin').read_bytes(), (PAYLOAD/'state.bin').read_bytes()
     if sha(code) != m['code_sha256'] or sha(state) != m['state_sha256']:
@@ -56,8 +75,11 @@ def build_patch(baseline):
     if any(baseline[header:header+120]) or header+120 > min(x[2] for x in sections):
         raise ValueError('No unused space for the new section headers.')
     file_align, section_align = u32(baseline,opt+36), u32(baseline,opt+32)
-    if m['code_rva'] != align(u32(baseline,opt+56),section_align):
+    code_section = align(u32(baseline,opt+56),section_align)
+    prefix = m['code_rva'] - code_section
+    if prefix not in (0, section_align):
         raise ValueError('Unexpected image size.')
+    code = bytes(prefix) + code
 
     # Retain every existing RUNTIME_FUNCTION record and append helpers in RVA
     # order. Put unwind data/table in a read-only section, code RX, state RW.
@@ -72,7 +94,7 @@ def build_patch(baseline):
     table_rva = m['unwind_rva']+len(ro)
     ro.extend(entries)
     result = bytearray(baseline)
-    added = [(b'.sofcode',m['code_rva'],code,0x60000020),
+    added = [(b'.sofcode',code_section,code,0x60000020),
              (b'.sofdata',m['data_rva'],state,0xc0000040),
              (b'.sofunw',m['unwind_rva'],bytes(ro),0x40000040)]
     code_size = data_size = 0
@@ -95,26 +117,13 @@ def build_patch(baseline):
     struct.pack_into('<I',result,opt+56,align(m['unwind_rva']+len(ro),section_align))
     struct.pack_into('<I',result,opt+64,0) # unsigned user-mode DLL; checksum optional
     struct.pack_into('<II',result,opt+112+3*8,table_rva,len(entries))
-    hooks = [
-        (0x6dde70,'48895c2408','third_spawn',b'\xe9'),
-        (0x925a20,'405641554156','third_reset',b'\xe9'),
-        (0x6dd430,'40564883ec20','third_despawn',b'\xe9'),
-        (0x1187030,'40534883ec20','third_input_awake',b'\xe9'),
-        (0x8fed9a,'e851daddff','third_dispatch',b'\xe8'),
-        (0x8c0e90,'48895c2410','third_inventory_update',b'\xe9'),
-        (0x8c0490,'40534881ec60010000','third_inventory_match',b'\xe9'),
-        (0x6c5331,'e8aad3e3ff','third_save_count',b'\xe8'),
-        (0x6c5389,'e852d3e3ff','third_save_count',b'\xe8'),
-        (0x6c563e,'e89dd0e3ff','third_save_count',b'\xe8'),
-        (0x6c5696,'e845d0e3ff','third_save_count',b'\xe8'),
-    ]
-    for address, expected, symbol, opcode in hooks:
+    for address, expected, symbol, opcode in HOOKS:
         expected = bytes.fromhex(expected)
         file = offset(sections,address)
         if baseline[file:file+len(expected)] != expected:
             raise ValueError(f'Hook bytes mismatch at {address:x}.')
         target = m['symbols'][symbol]['rva']
-        result[file:file+len(expected)] = opcode+struct.pack('<i',target-address-5)+b'\x90'*(len(expected)-5)
+        result[file:file+len(expected)] = bytes([opcode])+struct.pack('<i',target-address-5)+b'\x90'*(len(expected)-5)
     return bytes(result)
 
 def replace(path, data):
@@ -161,24 +170,31 @@ def main():
     dll = args.dll.resolve()
     current = dll.read_bytes()
     plan = read_plan()
-    if sha(current) not in plan['accepted_sha256']:
+    current_hash = sha(current)
+    variant = next((entry for entry in plan['variants']
+                    if current_hash in (entry['original_sha256'], entry['patched_sha256'])), None)
+    if variant is None:
         raise ValueError('Unsupported game DLL. Nothing was changed.')
     if args.action == 'check':
-        status = 'INSTALLED' if sha(current)==plan['patched_sha256'] else (
-            'not installed' if sha(current)==BASELINE_SHA256 else 'older revision installed')
-        print('3 Player Mod: '+status)
-        print('SHA256: '+sha(current))
+        status = 'INSTALLED' if current_hash == variant['patched_sha256'] else 'not installed'
+        print(f"3 Player Mod: {status} ({variant['label']})")
+        print('SHA256: '+current_hash)
         return
-    operation = plan['actions']['Install' if args.action=='apply' else 'Uninstall']
+    operation = variant['actions']['Install' if args.action == 'apply' else 'Uninstall']
     output = reconstruct(current, operation)
     if output != current:
-        backup = dll.with_name(dll.name+'.backup-before-3-player-mod')
+        backup = dll.with_name(dll.name + variant['backup_suffix'])
+        original = current if args.action == 'apply' else output
         if backup.exists():
-            if sha(backup.read_bytes()) not in plan['accepted_sha256']:
+            if sha(backup.read_bytes()) != variant['original_sha256']:
                 raise ValueError('Existing backup is unrecognized; nothing was changed.')
         else:
-            with backup.open('xb') as out: out.write(current)
-            if backup.read_bytes()!=current: raise ValueError('Backup verification failed.')
+            with backup.open('xb') as out:
+                out.write(original)
+            if sha(backup.read_bytes()) != variant['original_sha256']:
+                raise ValueError('Backup verification failed.')
+        if sha(dll.read_bytes()) != current_hash:
+            raise ValueError('The game file changed during setup.')
         replace(dll, output)
     print('3 Player Mod installed.' if args.action=='apply' else '3 Player Mod removed.')
 

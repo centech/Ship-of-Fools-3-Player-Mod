@@ -21,6 +21,7 @@ import pefile
 ROOT = Path(__file__).resolve().parent
 GAME_DLL = Path(os.environ.get('SOF_TEST_DLL', 'GameAssembly.dll'))
 HAS_GAME_DLL = GAME_DLL.is_file()
+SIREN_DLL = Path(os.environ.get('SOF_TEST_SIREN_DLL', 'SirenGameAssembly.dll'))
 GAME_DLL_REASON = 'Set SOF_TEST_DLL to your verified original game DLL for this test.'
 spec = importlib.util.spec_from_file_location('patch',ROOT.parent/'patch_third_player.py')
 patch = importlib.util.module_from_spec(spec);spec.loader.exec_module(patch)
@@ -67,22 +68,22 @@ class Game:
             value.information.has_value=True;value.information.value.number=i
             self.write(bp,bytes(value))
         self.callbacks={
-            0x6dde75:lambda:self.original('spawn',5),
-            0x925a26:lambda:self.original('reset',6),
-            0x6dd436:lambda:self.original('despawn',6),
-            0x1187036:lambda:self.original('input_awake',6),
-            0x8c0e95:self.inventory_update,
-            0x8c0499:self.inventory_match,
-            0x8bf670:self.inventory_link,0x8c03a0:self.inventory_toggle,
-            0x5026e0:lambda:self.ret(len(self.actors)),
-            0x119c810:lambda:self.ret(self.actors[self.r('rdx')]),
-            0x923330:self.get_controller,0xad0880:self.is_keyboard,
-            0x9228f0:self.assigned,0x6ddba0:self.spawn,
-            0x318cf0:self.new_handle,0x318ce0:self.target,0x318cd0:self.free,
-            0x319600:self.string,0xd9b9b0:self.log,0x6dc7f0:self.dispatch,
-            0x1d36a20:self.clone_editor,0xce5da0:self.new_id,
+            0x6ddf05:lambda:self.original('spawn',5),
+            0x911a86:lambda:self.original('reset',6),
+            0x6dd4c6:lambda:self.original('despawn',6),
+            0x1172ef6:lambda:self.original('input_awake',6),
+            0x8ad005:self.inventory_update,
+            0x8ac609:self.inventory_match,
+            0x8ab7e0:self.inventory_link,0x8ac510:self.inventory_toggle,
+            0x502750:lambda:self.ret(len(self.actors)),
+            0x11886d0:lambda:self.ret(self.actors[self.r('rdx')]),
+            0x90f390:self.get_controller,0xabcae0:self.is_keyboard,
+            0x90e950:self.assigned,0x6ddc30:self.spawn,
+            0x318790:self.new_handle,0x318780:self.target,0x318770:self.free,
+            0x3190a0:self.string,0xd87870:self.log,0x6dc880:self.dispatch,
+            0x1d22ce0:self.clone_editor,0xcd1c90:self.new_id,
             0x495c60:lambda:self.name(0x18),0x495c50:lambda:self.name(0x20),
-            0x397c60:self.metadata,0x23ca7e0:self.add_editor,
+            0x397700:self.metadata,0x23b6aa0:self.add_editor,
         }
         for address in self.callbacks:self.write(base+address,b'\xc3')
         self.u.hook_add(U.UC_HOOK_CODE,self.code)
@@ -112,7 +113,7 @@ class Game:
         callback=self.callbacks.get(address-self.base)
         if callback:
             # Windows x64: at function entry return address leaves RSP == 8 mod16.
-            if (address-self.base) not in [0x6dde75,0x925a26,0x6dd436,0x1187036,0x8c0e95,0x8c0499,0x6c6189,0x6c6199,0x6c575a,0x8c0f4e]:
+            if (address-self.base) not in [0x6ddf05,0x911a86,0x6dd4c6,0x1172ef6,0x8ad005,0x8ac609,0x6c6219,0x6c6229,0x6c57ea,0x8ad0be]:
                 assert self.r('rsp')%16==8,hex(address)
                 if not getattr(self,'native_integration',False):self.check_unwind()
             self.native_call_count+=1
@@ -281,7 +282,7 @@ class PayloadTests(unittest.TestCase):
         # not a stub. It must read the same bytes our fixture and mod inspect.
         baseline=Path(os.environ.get('SOF_TEST_DLL','GameAssembly.dll')).read_bytes()
         p=pefile.PE(data=baseline,fast_load=True)
-        g=Game();address=0x8df680
+        g=Game();address=0x8cb7f0
         g.write(g.base+address,p.get_data(address,0x6f))
         out=g.obj(0xa0);bp=g.blueprints+0x20+0xc0
         g.call(address,out,bp+Blueprint.information.offset,0)
@@ -414,20 +415,20 @@ class PayloadTests(unittest.TestCase):
         g.native_integration=True
         # Execute real Update through its inventory button and real Toggle,
         # then skip cursor/render work and use Update's original epilogue.
-        g.write(g.base+0x8c0e95,pe.get_data(0x8c0e95,0x589))
-        g.write(g.base+0x8c03a0,pe.get_data(0x8c03a0,0xe7))
-        del g.callbacks[0x8c0e95];del g.callbacks[0x8c03a0]
+        g.write(g.base+0x8ad005,pe.get_data(0x8ad005,0x589))
+        g.write(g.base+0x8ac510,pe.get_data(0x8ac510,0xe7))
+        del g.callbacks[0x8ad005];del g.callbacks[0x8ac510]
         movement=g.obj(0x40);shown=g.obj(0x40);hidden=g.obj(0x40)
         audio=g.obj(0x30);g.ptr(audio+0x18,g.obj(0x20));g.ptr(audio+0x20,g.obj(0x20))
         g.ptr(inv+0xb8,movement);g.ptr(inv+0x30,shown);g.ptr(inv+0x28,hidden)
         g.ptr(inv+0x18,audio)
         targets=[]
         def target():targets.append(g.r('rdx'));g.ret()
-        g.callbacks.update({0x186ea90:lambda:g.ret(1),
-            0x7a6c50:target,0xd96860:lambda:g.ret(inv),0x25de640:lambda:g.ret(),
-            0x8c0f4e:lambda:g.setr('rip',g.base+0x8c13fd)})
+        g.callbacks.update({0x185ac10:lambda:g.ret(1),
+            0x792d60:target,0xd82720:lambda:g.ret(inv),0x25ca900:lambda:g.ret(),
+            0x8ad0be:lambda:g.setr('rip',g.base+0x8ad56d)})
         md=capstone.Cs(capstone.CS_ARCH_X86,capstone.CS_MODE_64);md.detail=True
-        for ins in md.disasm(pe.get_data(0x8c0e95,0x589),0x8c0e95):
+        for ins in md.disasm(pe.get_data(0x8ad005,0x589),0x8ad005):
             for op in ins.operands:
                 if op.type==capstone.x86.X86_OP_MEM and op.mem.base==capstone.x86.X86_REG_RIP and op.size==8:
                     g.ptr(g.base+ins.address+ins.size+op.mem.disp,g.obj(0x200))
@@ -449,8 +450,8 @@ class PayloadTests(unittest.TestCase):
         g.native_integration=True
         # Native LinkToPlayer runs its real unsubscribe, bind, portrait and
         # trinket-refresh sequence. Only engine/collection services are mocked.
-        g.write(g.base+0x8bf670,pe.get_data(0x8bf670,0x22e))
-        g.write(g.base+0x8c0499,pe.get_data(0x8c0499,0x96))
+        g.write(g.base+0x8ab7e0,pe.get_data(0x8ab7e0,0x22e))
+        g.write(g.base+0x8ac609,pe.get_data(0x8ac609,0x96))
         ui=g.obj(0x80);g.ptr(inv+0x40,ui)
         calls=[];delegate_actor=g.obj(0x40)
         def info():
@@ -465,27 +466,27 @@ class PayloadTests(unittest.TestCase):
         def trinkets():
             actor=g.r('rcx');calls.append(('trinkets',actor));g.ret(actor+0x180)
         def refresh():calls.append(('refresh',g.r('rdx')));g.ret()
-        g.callbacks.update({0x397da0:instantiate,0x3f3b70:constructor,
-            0x677e00:first,0x186eb60:lambda:g.ret(g.r('rcx')!=g.r('rdx')),
-            0x186ea90:lambda:g.ret(bool(g.r('rcx'))),
-            0x74bbc0:lambda:g.ret(),0x74bab0:lambda:g.ret(),
-            0x80cfb0:lambda:g.ret(),0x74b570:trinkets,0x8c0860:refresh,
-            0x91c420:info})
+        g.callbacks.update({0x397840:instantiate,0x3f3b70:constructor,
+            0x677e90:first,0x185ace0:lambda:g.ret(g.r('rcx')!=g.r('rdx')),
+            0x185ac10:lambda:g.ret(bool(g.r('rcx'))),
+            0x74c1f0:lambda:g.ret(),0x74c0e0:lambda:g.ret(),
+            0x7f90d0:lambda:g.ret(),0x74bba0:trinkets,0x8ac9d0:refresh,
+            0x908470:info})
         # Discover referenced metadata globals directly from the real code.
         import capstone
         md=capstone.Cs(capstone.CS_ARCH_X86,capstone.CS_MODE_64);md.detail=True
-        for ins in md.disasm(pe.get_data(0x8bf670,0x22e),0x8bf670):
+        for ins in md.disasm(pe.get_data(0x8ab7e0,0x22e),0x8ab7e0):
             for op in ins.operands:
                 if op.type==capstone.x86.X86_OP_MEM and op.mem.base==capstone.x86.X86_REG_RIP:
                     address=g.base+ins.address+ins.size+op.mem.disp
                     if op.size==8:g.ptr(address,g.obj(0x200))
         g.i32(g.base+MANIFEST['data_rva']+48,3)
         # Drop stub registration so the real LinkToPlayer runs.
-        del g.callbacks[0x8bf670]
+        del g.callbacks[0x8ab7e0]
         for actor in g.actors:
             g.call('third_inventory_match',inv,actor,0)
             self.assertEqual(g.r('rax')&255,actor==clone)
-        g.call(0x8bf670,inv,0,0,0)
+        g.call(0x8ab7e0,inv,0,0,0)
         self.assertEqual(g.ptr(inv+0xc0),clone)
         self.assertEqual(calls,[('trinkets',clone),('refresh',clone+0x180)])
 
@@ -513,21 +514,21 @@ class PayloadTests(unittest.TestCase):
             g=Game();g.start();g.press(7);g.native_integration=True
             image=patch.build_patch(dll) if fixed else dll
             pe=pefile.PE(data=image,fast_load=True)
-            g.write(g.base+0x6c561b,pe.get_data(0x6c561b,0x13f))
+            g.write(g.base+0x6c56ab,pe.get_data(0x6c56ab,0x13f))
             state=g.obj(0x300);data=g.obj(0x100);old_fools=g.obj(0x30)
             g.ptr(state+0x210,g.scene);g.ptr(state+0x1f8,g.ps)
             g.ptr(state+0x1c0,data);g.ptr(data+0xa0,old_fools)
             output=[];failure=[]
             def add_fool():output.append(g.r('rdx'));g.ret()
             def fail():failure.append('IndexOutOfRangeException');g.u.emu_stop()
-            g.callbacks.update({0x6de9e0:lambda:g.ret(g.scene),
-                0x24656d0:add_fool,0x6c6189:fail,0x6c6199:fail,
-                0x6c575a:lambda:g.u.emu_stop()})
+            g.callbacks.update({0x6dea70:lambda:g.ret(g.scene),
+                0x2451990:add_fool,0x6c6219:fail,0x6c6229:fail,
+                0x6c57ea:lambda:g.u.emu_stop()})
             g.setr('rsp',g.stack+0x1ff000);g.setr('rbp',state)
             g.setr('rbx',state+0x1c0);g.setr('r14',g.obj(0x30))
             for r in ['r12','rdi','rsi']:g.setr(r,0)
             g.setr('rcx',g.scene)
-            g.u.emu_start(g.base+0x6c561b,g.base+0x6c6200,count=2000)
+            g.u.emu_start(g.base+0x6c56ab,g.base+0x6c6290,count=2000)
             self.assertEqual(output,[10,11])
             self.assertEqual(bool(failure),not fixed)
     def test_runtime_input_slot_clones_pad_maps(self):
@@ -582,22 +583,31 @@ class PatchTests(unittest.TestCase):
 
     def test_hook_targets_and_normal_ship_cleanup(self):
         p=pefile.PE(data=self.patched,fast_load=True)
-        for rva,name in [(0x6dde70,'third_spawn'),(0x925a20,'third_reset'),
-                         (0x6dd430,'third_despawn'),(0x1187030,'third_input_awake'),
-                         (0x8fed9a,'third_dispatch'),(0x8c0e90,'third_inventory_update'),
-                         (0x8c0490,'third_inventory_match')]+[(r,'third_save_count') for r in
-                         [0x6c5331,0x6c5389,0x6c563e,0x6c5696]]:
+        clean, changed = patch.pe_layout(self.baseline)[-1], bytearray(self.patched)
+        for rva, expected, name, opcode in patch.HOOKS:
             code=p.get_data(rva,5)
+            self.assertEqual(code[0],opcode)
             self.assertEqual(rva+5+struct.unpack('<i',code[1:])[0],MANIFEST['symbols'][name]['rva'])
-        for off,size in [(0x7a5dd9,5),(0x260d810,102),(0x258,4)]:
-            self.assertEqual(self.patched[off:off+size],self.baseline[off:off+size])
-        # All original executable sections are byte-identical outside the verified hooks.
-        original=bytearray(self.baseline)
-        for rva,size in [(0x6dde70,5),(0x925a20,6),(0x6dd430,6),(0x1187030,6),(0x8fed9a,5),(0x8c0e90,5),(0x8c0490,9)]+[(r,5) for r in [0x6c5331,0x6c5389,0x6c563e,0x6c5696]]:
-            off=p.get_offset_from_rva(rva);original[off:off+size]=self.patched[off:off+size]
-        for s in p.sections[:2]:
-            off,size=s.PointerToRawData,s.SizeOfRawData
-            self.assertEqual(bytes(original[off:off+size]),self.patched[off:off+size])
+            off=patch.offset(clean,rva)
+            original=bytes.fromhex(expected)
+            changed[off:off+len(original)]=original
+        # This includes the native artifact cleanup and all other gameplay code.
+        self.assertEqual(changed[0x400:len(self.baseline)],self.baseline[0x400:])
+
+    @unittest.skipUnless(SIREN_DLL.is_file(), 'Set SOF_TEST_SIREN_DLL for combined-mod checks.')
+    def test_siren_round_trip_preserves_campaign_payload(self):
+        source=SIREN_DLL.read_bytes()
+        plan=patch.read_plan()
+        variant=next(item for item in plan['variants'] if item['name']=='siren')
+        combined=patch.reconstruct(source,variant['actions']['Install'])
+        self.assertEqual(combined,patch.build_patch(source))
+        original=pefile.PE(data=source,fast_load=True)
+        patched=pefile.PE(data=combined,fast_load=True)
+        old_code=next(section for section in original.sections if section.Name.startswith(b'.atscode'))
+        new_code=next(section for section in patched.sections if section.Name.startswith(b'.atscode'))
+        self.assertEqual(old_code.VirtualAddress,new_code.VirtualAddress)
+        self.assertEqual(old_code.get_data(),new_code.get_data())
+        self.assertEqual(patch.reconstruct(combined,variant['actions']['Uninstall']),source)
 
     def test_apply_check_restore_and_unknown_dll(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -611,7 +621,7 @@ class PatchTests(unittest.TestCase):
             run('apply');self.assertEqual(dll.read_bytes(),self.patched)
             self.assertIn('INSTALLED',run('check'));run('apply')
             run('restore');self.assertEqual(dll.read_bytes(),self.baseline)
-            self.assertEqual(dll.with_name(dll.name+'.backup-before-3-player-mod').read_bytes(),self.baseline)
+            self.assertEqual(dll.with_name(dll.name+'.backup-before-3-player-mod-1.5.4').read_bytes(),self.baseline)
             corrupt=bytearray(self.baseline);corrupt[0x1000]^=1;dll.write_bytes(corrupt)
             run('apply',1);self.assertEqual(dll.read_bytes(),corrupt)
 

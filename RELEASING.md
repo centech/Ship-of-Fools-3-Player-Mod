@@ -5,9 +5,9 @@ The prepared release is in **dist/**. For this version:
 1. Review and commit the repository changes, then push them to GitHub. You can
    use GitHub Desktop or your usual Git tools.
 2. On GitHub, open **Releases → Draft a new release**.
-3. Create tag **v0.4.0** and title it **Ship of Fools 3 Player Mod 0.4.0**.
-4. Copy the text from **dist/RELEASE_NOTES_0.4.0.md** into the description.
-5. Attach **Ship-of-Fools-3-Player-Mod-0.4.0.zip** from **dist/**. You can also
+3. Create tag **v0.5.0** and title it **Ship of Fools 3 Player Mod 0.5.0**.
+4. Copy the text from **dist/RELEASE_NOTES_0.5.0.md** into the description.
+5. Attach **Ship-of-Fools-3-Player-Mod-0.5.0.zip** from **dist/**. You can also
    attach the matching **.zip.sha256** file for people who want to check their
    download.
 6. Mark it as a **pre-release** while live testing is still limited, then publish

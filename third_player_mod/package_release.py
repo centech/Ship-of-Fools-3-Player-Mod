@@ -6,7 +6,7 @@ from pathlib import Path
 import zipfile
 
 ROOT=Path(__file__).resolve().parent.parent
-VERSION='0.4.0'
+VERSION='0.5.0'
 ROOT_FILES=['Install.cmd','Uninstall.cmd','READ ME.txt']
 MOD_FILES=['LICENSE.txt','patch.ps1','release-plan.json']
 FILES=ROOT_FILES+['third_player_mod/'+name for name in MOD_FILES]

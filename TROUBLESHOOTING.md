@@ -36,8 +36,9 @@ ship before changing areas or quitting.
 
 ## The installer says my game isn't supported
 
-This mod works with one Windows Steam game version. Check the project for a
-compatible update. If you use other mods, they may also affect compatibility.
+Version 0.5.0 supports Windows Steam 1.5.4, including After the Storm's Siren
+Update 1.2. If you are still on 1.5.3, use version 0.4.0. Other mods can affect
+compatibility.
 
 ## There's a backup error
 

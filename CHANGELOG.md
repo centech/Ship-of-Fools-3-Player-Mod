@@ -1,5 +1,11 @@
 # Changes
 
+## 0.5.0
+
+- Updated the mod for Steam 1.5.4 on Windows.
+- Added compatibility with After the Storm's Siren Update 1.2. The 3 Player
+  Mod uninstaller restores the installed Siren Update when both are present.
+
 ## 0.4.0
 
 - Focus the package on three-player local co-op; remove unrelated gameplay changes.

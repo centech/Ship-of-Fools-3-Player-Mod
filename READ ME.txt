@@ -1,5 +1,5 @@
 SHIP OF FOOLS - 3 PLAYER MOD
-Version 0.4.0 | Windows / Steam
+Version 0.5.0 | Windows / Steam 1.5.4
 
 INSTALL
 1. Close the game.
@@ -31,3 +31,7 @@ Make sure you extracted the ZIP into the actual game folder, not Downloads.
 If Windows denies access, right-click Install.cmd and choose Run as administrator.
 If a download is damaged, download and extract a fresh copy.
 Visit the project's GitHub page for help and updates.
+
+AFTER THE STORM
+Install Siren Update 1.2 first, then run Install.cmd from this ZIP.
+To remove After the Storm, uninstall the 3 Player Mod first.
